@@ -18,6 +18,7 @@ public class AuthorManager : DomainService
     public async Task<Author> CreateAsync(
         [NotNull] string name,
         DateTime birthDate,
+        Guid authorId,
         [CanBeNull] string shortBio = null)
     {
         Check.NotNullOrWhiteSpace(name, nameof(name));
@@ -32,6 +33,7 @@ public class AuthorManager : DomainService
             GuidGenerator.Create(),
             name,
             birthDate,
+            authorId,
             shortBio
         );
     }
@@ -50,5 +52,14 @@ public class AuthorManager : DomainService
         }
 
         author.ChangeName(newName);
+    }
+
+    public async Task ChangeCountryAsync(
+        [NotNull] Author author,
+        [NotNull] Guid countryId)
+    {
+        Check.NotNull(author, nameof(author));
+
+        author.ChangeCountry(countryId);
     }
 }

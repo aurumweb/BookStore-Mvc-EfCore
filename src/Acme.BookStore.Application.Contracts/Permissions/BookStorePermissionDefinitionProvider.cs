@@ -15,15 +15,15 @@ public class BookStorePermissionDefinitionProvider : PermissionDefinitionProvide
         booksPermission.AddChild(BookStorePermissions.Books.Edit, L("Permission:Books.Edit"));
         booksPermission.AddChild(BookStorePermissions.Books.Delete, L("Permission:Books.Delete"));
 
-        var authorsPermission = bookStoreGroup.AddPermission(
-            BookStorePermissions.Authors.Default, L("Permission:Authors"));
-        authorsPermission.AddChild(
-            BookStorePermissions.Authors.Create, L("Permission:Authors.Create"));
-        authorsPermission.AddChild(
-            BookStorePermissions.Authors.Edit, L("Permission:Authors.Edit"));
-        authorsPermission.AddChild(
-            BookStorePermissions.Authors.Delete, L("Permission:Authors.Delete"));
+        var authorsPermission = bookStoreGroup.AddPermission(BookStorePermissions.Authors.Default, L("Permission:Authors"));
+        authorsPermission.AddChild(BookStorePermissions.Authors.Create, L("Permission:Authors.Create"));
+        authorsPermission.AddChild(BookStorePermissions.Authors.Edit, L("Permission:Authors.Edit"));
+        authorsPermission.AddChild(BookStorePermissions.Authors.Delete, L("Permission:Authors.Delete"));
 
+        var countriesPermission = bookStoreGroup.AddPermission(BookStorePermissions.Countries.Default, L("Permission:Countries"));
+        countriesPermission.AddChild(BookStorePermissions.Countries.Create, L("Permission:Countries.Create"));
+        countriesPermission.AddChild(BookStorePermissions.Countries.Edit, L("Permission:Countries.Edit"));
+        countriesPermission.AddChild(BookStorePermissions.Countries.Delete, L("Permission:Countries.Delete"));
     }
 
     private static LocalizableString L(string name)

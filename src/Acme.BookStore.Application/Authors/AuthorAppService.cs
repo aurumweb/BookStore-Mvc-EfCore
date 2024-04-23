@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Acme.BookStore.Books;
+using Acme.BookStore.Countries;
 using Acme.BookStore.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
+using System.Linq.Dynamic.Core;
+using Volo.Abp.ObjectMapping;
 
 namespace Acme.BookStore.Authors;
 
@@ -13,13 +17,16 @@ namespace Acme.BookStore.Authors;
 public class AuthorAppService : BookStoreAppService, IAuthorAppService
 {
     private readonly IAuthorRepository _authorRepository;
+    private readonly IRepository<Country, Guid> _countryRepository;
     private readonly AuthorManager _authorManager;
 
     public AuthorAppService(
         IAuthorRepository authorRepository,
+        IRepository<Country, Guid> countryRepository,
         AuthorManager authorManager)
     {
         _authorRepository = authorRepository;
+        _countryRepository = countryRepository;
         _authorManager = authorManager;
     }
 
@@ -36,12 +43,31 @@ public class AuthorAppService : BookStoreAppService, IAuthorAppService
             input.Sorting = nameof(Author.Name);
         }
 
-        var authors = await _authorRepository.GetListAsync(
-            input.SkipCount,
-            input.MaxResultCount,
-            input.Sorting,
-            input.Filter
-        );
+        //Get the IQueryable<Book> from the repository
+        var queryable = await _authorRepository.GetQueryableAsync();
+
+        //Prepare a query to join authors and countries
+        var query = from author in queryable
+                    join country in await _countryRepository.GetQueryableAsync() on author.CountryId equals country.Id
+                    select new { author, country };
+
+        //Paging
+        query = query
+            .OrderBy(NormalizeSorting(input.Sorting))
+            .Skip(input.SkipCount)
+            .Take(input.MaxResultCount);
+
+
+        //Execute the query and get a list
+        var queryResult = await AsyncExecuter.ToListAsync(query);
+
+        //Convert the query result to a list of AuhtorDto objects
+        var authorDtos = queryResult.Select(x =>
+        {
+            var authorDto = ObjectMapper.Map<Author, AuthorDto>(x.author);
+            authorDto.CountryName = x.country.Name;
+            return authorDto;
+        }).ToList();
 
         var totalCount = input.Filter == null
             ? await _authorRepository.CountAsync()
@@ -50,7 +76,16 @@ public class AuthorAppService : BookStoreAppService, IAuthorAppService
 
         return new PagedResultDto<AuthorDto>(
             totalCount,
-            ObjectMapper.Map<List<Author>, List<AuthorDto>>(authors)
+            authorDtos
+        );
+    }
+
+    public async Task<ListResultDto<CountryLookupDto>> GetCountryLookupAsync()
+    {
+        var countries = await _countryRepository.GetListAsync();
+
+        return new ListResultDto<CountryLookupDto>(
+            ObjectMapper.Map<List<Country>, List<CountryLookupDto>>(countries)
         );
     }
 
@@ -60,6 +95,7 @@ public class AuthorAppService : BookStoreAppService, IAuthorAppService
         var author = await _authorManager.CreateAsync(
             input.Name,
             input.BirthDate,
+            input.CountryId,
             input.ShortBio
         );
 
@@ -88,6 +124,25 @@ public class AuthorAppService : BookStoreAppService, IAuthorAppService
     public async Task DeleteAsync(Guid id)
     {
         await _authorRepository.DeleteAsync(id);
+    }
+
+    private static string NormalizeSorting(string sorting)
+    {
+        if (sorting.IsNullOrEmpty())
+        {
+            return $"author.{nameof(Author.Name)}";
+        }
+
+        if (sorting.Contains("countryName", StringComparison.OrdinalIgnoreCase))
+        {
+            return sorting.Replace(
+                "countryName",
+                "country.Name",
+                StringComparison.OrdinalIgnoreCase
+            );
+        }
+
+        return $"author.{sorting}";
     }
 
 }

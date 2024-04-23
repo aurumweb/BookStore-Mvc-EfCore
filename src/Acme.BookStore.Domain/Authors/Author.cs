@@ -10,6 +10,8 @@ public class Author : FullAuditedAggregateRoot<Guid>
     public string Name { get; private set; }
     public DateTime BirthDate { get; set; }
     public string ShortBio { get; set; }
+    public Guid CountryId { get; set; }
+
 
     private Author()
     {
@@ -20,12 +22,24 @@ public class Author : FullAuditedAggregateRoot<Guid>
         Guid id,
         [NotNull] string name,
         DateTime birthDate,
+        Guid countryId,
         [CanBeNull] string shortBio = null)
         : base(id)
     {
         SetName(name);
         BirthDate = birthDate;
         ShortBio = shortBio;
+        CountryId = countryId;
+    }
+
+    internal Author ChangeCountry(Guid countryId)
+    {
+        SetCountry(countryId);
+        return this;
+    }
+    private void SetCountry(Guid countryId)
+    {
+        CountryId = countryId;
     }
 
     internal Author ChangeName([NotNull] string name)

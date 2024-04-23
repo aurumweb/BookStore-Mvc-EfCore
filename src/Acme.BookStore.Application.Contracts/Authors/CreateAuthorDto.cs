@@ -11,6 +11,7 @@ public class CreateAuthorDto
 
     [Required]
     public DateTime BirthDate { get; set; }
-
+    [Required]
+    public Guid CountryId { get; set; }
     public string ShortBio { get; set; }
 }

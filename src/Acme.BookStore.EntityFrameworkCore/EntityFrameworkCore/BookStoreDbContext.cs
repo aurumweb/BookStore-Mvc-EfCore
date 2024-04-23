@@ -1,5 +1,6 @@
 ﻿using Acme.BookStore.Authors;
 using Acme.BookStore.Books;
+using Acme.BookStore.Countries;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -56,6 +57,7 @@ public class BookStoreDbContext :
 
     #endregion
 
+    public DbSet<Country> Countries { get; set; }
     public DbSet<Book> Books { get; set; }
 
     public DbSet<Author> Authors { get; set; }
@@ -81,6 +83,15 @@ public class BookStoreDbContext :
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
 
+        builder.Entity<Country>(b =>
+        {
+            b.ToTable(BookStoreConsts.DbTablePrefix + "Countries", BookStoreConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+            b.Property(x => x.Name).IsRequired().HasMaxLength(128);
+            b.HasIndex(x => x.Name);
+
+        });
+
         builder.Entity<Book>(b =>
         {
             b.ToTable(BookStoreConsts.DbTablePrefix + "Books", BookStoreConsts.DbSchema);
@@ -103,6 +114,9 @@ public class BookStoreDbContext :
                 .HasMaxLength(AuthorConsts.MaxNameLength);
 
             b.HasIndex(x => x.Name);
+
+            // ADD THE MAPPING FOR THE RELATION
+            b.HasOne<Country>().WithMany().HasForeignKey(x => x.CountryId).IsRequired();
         });
 
 
