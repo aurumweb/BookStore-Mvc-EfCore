@@ -11,6 +11,8 @@ public interface IAuthorAppService : IApplicationService
 
     Task<PagedResultDto<AuthorDto>> GetListAsync(GetAuthorListDto input);
 
+    Task<ListResultDto<CountryLookupDto>> GetCountryLookupAsync();
+
     Task<AuthorDto> CreateAsync(CreateAuthorDto input);
 
     Task UpdateAsync(Guid id, UpdateAuthorDto input);

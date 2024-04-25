@@ -65,6 +65,12 @@ public class BookStoreMenuContributor : IMenuContributor
                     l["Menu:Authors"],
                     url: "/Authors"
                 ).RequirePermissions(BookStorePermissions.Authors.Default)
+            ).AddItem( // ADDED THE NEW "COUNTRIES" MENU ITEM UNDER THE "BOOK STORE" MENU
+                new ApplicationMenuItem(
+                    "BooksStore.Countries",
+                    l["Menu:Countries"],
+                    url: "/Countries"
+                ).RequirePermissions(BookStorePermissions.Countries.Default)
             )
         );
 

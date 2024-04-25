@@ -1,16 +1,16 @@
 $(function () {
     var l = abp.localization.getResource('BookStore');
-    var createModal = new abp.ModalManager(abp.appPath + 'Authors/CreateModal');
-    var editModal = new abp.ModalManager(abp.appPath + 'Authors/EditModal');
+    var createModal = new abp.ModalManager(abp.appPath + 'Countries/CreateModal');
+    var editModal = new abp.ModalManager(abp.appPath + 'Countries/EditModal');
 
-    var dataTable = $('#AuthorsTable').DataTable(
+    var dataTable = $('#CountriesTable').DataTable(
         abp.libs.datatables.normalizeConfiguration({
             serverSide: true,
             paging: true,
             order: [[1, "asc"]],
             searching: false,
             scrollX: true,
-            ajax: abp.libs.datatables.createAjax(acme.bookStore.authors.author.getList),
+            ajax: abp.libs.datatables.createAjax(acme.bookStore.countries.country.getList),
             columnDefs: [
                 {
                     title: l('Actions'),
@@ -19,24 +19,22 @@ $(function () {
                             [
                                 {
                                     text: l('Edit'),
-                                    visible:
-                                        abp.auth.isGranted('BookStore.Authors.Edit'),
+                                    visible: abp.auth.isGranted('BookStore.Countries.Edit'), //CHECK for the PERMISSION
                                     action: function (data) {
                                         editModal.open({ id: data.record.id });
                                     }
                                 },
                                 {
                                     text: l('Delete'),
-                                    visible:
-                                        abp.auth.isGranted('BookStore.Authors.Delete'),
+                                    visible: abp.auth.isGranted('BookStore.Countries.Delete'), //CHECK for the PERMISSION
                                     confirmMessage: function (data) {
                                         return l(
-                                            'AuthorDeletionConfirmationMessage',
+                                            'BookDeletionConfirmationMessage',
                                             data.record.name
                                         );
                                     },
                                     action: function (data) {
-                                        acme.bookStore.authors.author
+                                        acme.bookStore.countries.country
                                             .delete(data.record.id)
                                             .then(function() {
                                                 abp.notify.info(
@@ -52,21 +50,6 @@ $(function () {
                 {
                     title: l('Name'),
                     data: "name"
-                },
-                {
-                    title: l('Country'),
-                    data: "countryName"
-                },
-                {
-                    title: l('BirthDate'),
-                    data: "birthDate",
-                    render: function (data) {
-                        return luxon
-                            .DateTime
-                            .fromISO(data, {
-                                locale: abp.localization.currentCulture.name
-                            }).toLocaleString();
-                    }
                 }
             ]
         })
@@ -80,7 +63,7 @@ $(function () {
         dataTable.ajax.reload();
     });
 
-    $('#NewAuthorButton').click(function (e) {
+    $('#NewCountryButton').click(function (e) {
         e.preventDefault();
         createModal.open();
     });

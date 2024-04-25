@@ -6,6 +6,7 @@
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
     "Menu:BookStore": "Book Store",
     "Menu:Books": "Books",
+    "Menu:Countries": "Countries",
     "Actions": "Actions",
     "Close": "Close",
     "Delete": "Delete",
@@ -43,6 +44,8 @@
     "Authors": "Authors",
     "AuthorDeletionConfirmationMessage": "Are you sure to delete the author '{0}'?",
     "BirthDate": "Birth date",
-    "NewAuthor": "New author"
+    "NewAuthor": "New author",
+    "NewCountry": "New Country"
+
   }
 }
